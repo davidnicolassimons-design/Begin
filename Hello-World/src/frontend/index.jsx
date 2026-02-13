@@ -1,18 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import ForgeReconciler, { Text } from '@forge/react';
-import { invoke } from '@forge/bridge';
+import ForgeReconciler, { Text, Spinner } from '@forge/react';
 
 const App = () => {
-  const [data, setData] = useState(null);
+  // Track whether the 5-second spinner duration has elapsed
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
-    invoke('getText', { example: 'my-invoke-variable' }).then(setData);
+    // Show the spinner for 5 seconds, then reveal the content
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 5000);
+
+    // Clean up the timer if the component unmounts
+    return () => clearTimeout(timer);
   }, []);
-  return (
-    <>
-      <Text>Hello world!</Text>
-      <Text>{data ? data : 'Loading...'}</Text>
-    </>
-  );
+
+  // Display spinner while loading, then show a message once done
+  if (isLoading) {
+    return <Spinner size="large" />;
+  }
+
+  return <Text>Welcome! Loading complete.</Text>;
 };
 
 ForgeReconciler.render(
